@@ -1,0 +1,25 @@
+{
+    "Records":[
+       {
+          "messageId":"6e9a01e4-5adc-49bb-87ce-0f4a607216f2",
+          "receiptHandle":"AQEBm/p4gDMCzcCnEuUEuIsoI50rca9COUytbM60c+gF6idz/8cw9kPA/vaRKPOKFWD51gunuLGErGP7GQcB2Y0nZ8/eyIkw27SSLhZ2Eyu4OHS1WdGiwKuUOgkhO9ESA/48qCKBhUTrPMCbjRGQ2F35khS5/7TWajAlD8DIHZtR2AairjTmS7TFwriZVUPuXJR+ifKS7WgQjPlhbh/QJehjDZNSjApGp+klts1w6Z8l8G1cPe0Y6OZzMUIrFU6wv+FjyzE7IAllNnzLDFtIR4uFoVA4f6HKZPHXYk+gLpnfw5I=",
+          "body":"{\n  \"Type\" : \"Notification\",\n  \"MessageId\" : \"b48a8fc8-747f-5bca-8055-d39ffcbb9f62\",\n  \"SequenceNumber\" : \"10000000000000059000\",\n  \"TopicArn\" : \"arn:aws:sns:us-east-1:262979292457:ffd-stg-amercent-38522.fifo\",\n  \"Message\" : \"Location=pa-analytics-demo/PAP_EXTRACT_CHARACTERISTICS.txt,FileCount=1\",\n  \"Timestamp\" : \"2023-02-03T22:11:16.439Z\",\n  \"UnsubscribeURL\" : \"https://sns.us-east-1.amazonaws.com/?Action=Unsubscribe&SubscriptionArn=arn:aws:sns:us-east-1:262979292457:ffd-stg-amercent-38522.fifo:74142d47-346e-48b5-9976-b58324e585c2\",\n  \"MessageAttributes\" : {\n    \"type\" : {\"Type\":\"String\",\"Value\":\"analytics_upload\"}\n  }\n}",
+          "attributes":{
+             "ApproximateReceiveCount":"75",
+             "SentTimestamp":"1675462276621",
+             "SequenceNumber":"18875662416524530432",
+             "MessageGroupId":"t123",
+             "SenderId":"AIDAYRRVD2ENU4DSO2WBX",
+             "MessageDeduplicationId":"a9a76522318cd7cb2ffb849fc27362a738577dfa74427739cb17fc4427254de3",
+             "ApproximateFirstReceiveTimestamp":"1675462276621"
+          },
+          "messageAttributes":{
+             
+          },
+          "md5OfBody":"0dd301f0f2d405376083e94dd035e59e",
+          "eventSource":"aws:sqs",
+          "eventSourceARN":"arn:aws:sqs:us-east-1:648803228730:aci-loader-poc2.fifo",
+          "awsRegion":"us-east-1"
+       }
+    ]
+ }
