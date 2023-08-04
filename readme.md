@@ -18,6 +18,9 @@ You must store the AWS credentials in the *credentials* file, usually in the *.a
 ## VPC and Subnets
 This project uses a Virtual Private Cloud (VPC) and subnets. Create a VPC beforehand and **set SQS as an endpoint**. If a VPC is unnecessary, remove all the logic around the VPC.
 
+## `var.tfvars` files
+Each step needs a `var.tfvars` file in its directory to provide the required inputs. Information about the required variables can be found in each step's readme page under **Inputs** section. For more information on how to write `.tfvars` file, please check out the [terraform official documentation](https://registry.terraform.io/providers/terraform-redhat/rhcs/latest/docs/guides/terraform-vars).
+
 # Deployment
 ## Step 1. [IAM Role Creator Module](step_1-iam_role_creator/README.md) (Optional)
 This is an one-time deployment step that creates an IAM role with an appropriate access policy to subscribe data provider’s SNS topic and copy the data from the provider's S3. On successful execution terraform script will output the IAM Role ARN. Add the IAM role ARN to *var.tfvars* in Step 2, 3, and 4. If you already have a role with the proper IAM policy, you can skip running this module and follow the next instruction.
@@ -29,11 +32,11 @@ This is an one-time deployment step that creates a Redshift cluster, database, u
 
 ## Step 3. [Pipeline Builder](step_3-pipeline_builder/README.md)
 ### [Data Copier Module](step_3-pipeline_builder/modules/data_copier/README.md)
-It listens to the data provider's SNS topic, copies relevant data into your bucket, and triggers *data_transformer* SQS.
+The data copier module listens to the data provider's SNS topic, copies relevant data into your bucket, and triggers *data_transformer* SQS.
 
 #### Notes
-- It publishes a message to the *data_transformer* SQS only when [data file(txt file)](#data-transformer-module) is delivered.
-- It assumes that there are specific directories to watch within the provider's S3 bucket. For instance, your provider created a directory called *relevant_data_to_abc* to store data that is relevant to you. Add *relevant_data_to_abc* to a global variable *TARGET_DIRS* in the *data_copier* Lambda script to copy data stored in a specific directory.
+- The module publishes a message to the *data_transformer* SQS only when [data file(txt file)](#data-transformer-module) is delivered.
+- the module assumes that there are specific directories to watch within the provider's S3 bucket. For instance, your provider created a directory called *relevant_data_to_abc* to store data that is relevant to you. Add *relevant_data_to_abc* to a global variable *TARGET_DIRS* in the *data_copier* Lambda script to copy data stored in a specific directory.
 
 ### [Data Transformer Module](modules/data_transformer/README.md)
 - Parses data and schema (**both are required**).
@@ -58,19 +61,19 @@ It listens to the data provider's SNS topic, copies relevant data into your buck
         ]
         }
         ```
-- If a schema file is not delivered, it will re-try to retrieve the schema file a few times and eventually raise an exception.
-- It uses a configuration file, *cfg.csv*, for data-table mapping.
-- It uses a column, *Report Type*, for the date-table mapping in the cfg file.
+- If a schema file is not delivered, the data transformer module will re-try to retrieve the schema file a few times and eventually raise an exception.
+- The data transformer module uses a configuration file, *cfg.csv*, for data-table mapping.
+- The module uses a column, *Report Type*, for the date-table mapping in the cfg file.
 - Redshift only allows letter, @, \_, or \# as a first character of the column name. If this requirement is not met, `_get_rs_column_name()` adds "_" to the front of the name.
 - Redshift column name should be less than 127 bytes. If the name is longer, Redshift will truncate it to 127 bytes.
 - Required data file columns have to be included in `REQUIRED_COLS` in Lambda.
-- It processes data in chunk to support large data set efficiently. The chunk size can be set as `CHUNK_SIZE` in Lambda.
-- It uses a column, *Output ID*, to handle re-statement.
-- It only supports *varchar(max)* and *float* SQL data types to reduce complexity around various data types.
+- The module processes data in chunk to support large data set efficiently. The chunk size can be set as `CHUNK_SIZE` in Lambda.
+- The module uses a column, *Output ID*, to handle re-statement.
+- The module only supports *varchar(max)* and *float* SQL data types to reduce complexity around various data types.
 - Lambda has up to 15-minute timeout restriction and memory restriction which can cause problem when processing large data.
 
 ### [Redshift Loader Module](modules/redshift_loader/README.md)
-It prepares a Redshift table for data to be copied, including creating a table if it does not exist and adding new columns, copies the data, and deletes the used staging file.
+The Redshift loader module prepares a Redshift table for data to be copied, including creating a table if it does not exist and adding new columns, copies the data, and deletes the used staging file.
 
 ## Step 4. [SNS Subscriber](step_4-sns_subscriber/README.md)
 This is an one-time deployment step that subscribes the data source's SNS topic. This step has to be run after the data source granted a permission to your IAM role to access their resources.
