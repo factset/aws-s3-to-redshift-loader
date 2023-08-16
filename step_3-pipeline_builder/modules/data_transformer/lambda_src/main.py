@@ -8,6 +8,7 @@ import boto3
 import psycopg2
 import pandas as pd
 from io import BytesIO, TextIOWrapper
+from botocore.exceptions import ClientError
 
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
@@ -57,7 +58,7 @@ def lambda_handler(event, context):
     """
     # get cfg file in dataframe format
     try:
-        cfg = _get_data(CFG_FILE_PATH)
+        cfg = _get_data(CFG_FILE_PATH, pipe_delimited=False)
     except Exception as e:
         LOGGER.error(f"Unable to get the cfg file from {CFG_FILE_PATH}. Please check the path.")
     
@@ -109,8 +110,8 @@ def lambda_handler(event, context):
                 updated_schema[converted_col] = COLS_DTYPES[converted_col]
             else:
                 for col_set in schema["fields"]:
-                    if col_set["name"] == raw_col:
-                        updated_schema[converted_col] = _get_rs_data_type(col_set["type"])
+                    if col_set["name"].lower() == raw_col.lower():
+                        updated_schema[converted_col] = _get_rs_data_type(col_set["type"].lower())
 
             if converted_col not in updated_schema.keys():
                 LOGGER.warn(f"Column, {raw_col}, is missing in the schema.")
@@ -229,7 +230,6 @@ def lambda_handler(event, context):
                                         This may cause an issue when copying the data in Redshift.
                                         """
                                     )
-                                    
                 if table_exist:
                     # get distinct list of lookup values except the ones that is already checked
                     lookup_vals = set(df[LOOKUP_COL].values)
@@ -312,7 +312,7 @@ def _get_json_file(s3_resource, bucket, key):
         obj = s3_resource.Object(bucket, key)
         data = obj.get()["Body"].read()
         return json.loads(data)
-    except Exception:
+    except ClientError as e:
         return {}
     
 
@@ -371,7 +371,7 @@ def _save_staging_file_in_s3(s3_resource, bucket, filename, df):
     return s3_key
 
     
-def _get_data(file, chunksize=0, nrows=None, columns=None):
+def _get_data(file, chunksize=0, nrows=None, columns=None, pipe_delimited=True):
     """
     Returns: data in file -> pandas.DataFrame
     
@@ -393,7 +393,7 @@ def _get_data(file, chunksize=0, nrows=None, columns=None):
         args["header"] = None
         
     if ext in [".csv", ".txt"]:
-        if ext == ".txt":
+        if pipe_delimited:
             args["delimiter"] = DELIMITER
         return pd.read_csv(file, **args)
     elif ext == ".json":
@@ -439,7 +439,9 @@ def _get_rs_column_name(name):
         " ": "_", 
         "/": "_", 
         "-": "_", 
-        ":": "_"
+        ":": "_",
+        "(": "",
+        ")": "",
     }
 
     for key, val in replace_vals.items():
