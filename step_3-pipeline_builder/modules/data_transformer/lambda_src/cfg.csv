@@ -1,15 +1,2 @@
 rs_table,report_type
-attribution,EQ_ATTR_REIT_SEC
-attribution,EQ_ATTR_COUNTRY
-attribution,EQ_ATTR_GICS_SEC_IND
-attribution,US_RISK_ATTR_GICS_SEC_IND
-attribution,US_RISK_ATTR_REIT_SEC
-attribution,GLOBAL_RISK_ATTR_REGION_COUNTRY
-attribution,GLOBAL_RISK_ATTR_GICS_SEC_IND
-attribution,GLOBAL_RISK_ATTR_REIT_SEC
-port_characteristics,EQ_PORT_CHAR
-port_characteristics,US_RISK_PORT_CHAR
-port_characteristics,GLOBAL_RISK_PORT_CHAR
-pit_analytics,EQ_PIT_GICS_SEC_IND
-pit_analytics,EQ_PIT_COUNTRY
-pit_analytics,EQ_PIT_REIT_SEC
+rs_table_1,report_type_1
